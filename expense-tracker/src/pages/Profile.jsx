@@ -1,70 +1,95 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { login } from "../features/authslice";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../features/authslice";
 
-export default function LoginPage() {
-  const [emailAddress, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Profile() {
   const dispatch = useDispatch();
+  const { user, loading, error } = useSelector((state) => state.auth || {});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(login({ emailAddress, password }));
-    setEmail("");
-    setPassword("");
-  };
+  const fullName = user?.fullName || "—";
+  const email = user?.emailAddress || user?.email || "—";
+  const profileImg =
+    user?.profileImg || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  const createdAt = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString()
+    : "—";
+  const updatedAt = user?.updatedAt
+    ? new Date(user.updatedAt).toLocaleDateString()
+    : "—";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back 👋</h2>
-        <p className="text-gray-500 mb-8">Login to manage your finances</p>
+    <div className="space-y-8 text-gray-900 animate-fadeIn">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+        <img
+          src={profileImg}
+          alt="avatar"
+          className="h-24 w-24 rounded-full ring-2 ring-emerald-200 object-cover hover:scale-105 transition-transform duration-300"
+        />
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex-1 text-center sm:text-left">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-800">
+            {fullName}
+          </h1>
+          <p className="text-gray-500">{email}</p>
+        </div>
+
+        <button
+          onClick={() => dispatch(logout())}
+          disabled={loading}
+          className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition-all active:scale-95 disabled:opacity-50"
+        >
+          {loading ? "Logging out..." : "Logout"}
+        </button>
+      </div>
+
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-600 text-center font-medium shadow-sm">
+          {String(error)}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm hover:shadow-md transition-all">
+          <p className="text-sm text-gray-500">Member since</p>
+          <p className="mt-1 text-2xl font-semibold text-emerald-600">
+            {createdAt}
+          </p>
+        </div>
+        <div className="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm hover:shadow-md transition-all">
+          <p className="text-sm text-gray-500">Last updated</p>
+          <p className="mt-1 text-2xl font-semibold text-blue-600">
+            {updatedAt}
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl bg-white border border-gray-200 p-8 shadow-sm hover:shadow-md transition-all">
+        <h2 className="text-2xl font-semibold mb-6 text-gray-800 tracking-tight">
+          Account Details
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
+            <label className="block text-sm text-gray-500 mb-2">
+              Full Name
             </label>
+            <input
+              type="text"
+              defaultValue={fullName}
+              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 transition-all"
+              readOnly
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-500 mb-2">Email</label>
             <input
               type="email"
-              value={emailAddress}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              defaultValue={email}
+              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all"
+              readOnly
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors"
-          >
-            Login Securely
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-gray-600 text-sm">
-          New here?{" "}
-          <Link
-            to="/signup"
-            className="text-blue-600 font-medium hover:underline"
-          >
-            Create Account
-          </Link>
-        </p>
+        </div>
       </div>
     </div>
   );

@@ -1,71 +1,85 @@
-
-import React from "react";
-import { Link } from "react-router-dom";
-
+import React, { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../features/authslice";
 
 export default function SignupPage() {
+  const { user, loading, error } = useSelector((state) => state.auth);
+  const [fullName, setFullName] = useState("");
+  const [emailAddress, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+
+  if (loading) return <p className="text-gray-300 text-center">Checking authentication...</p>;
+  if (user) return <Navigate to="/dashboard" replace />;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(register({ fullName, emailAddress, password }));
+    setFullName("");
+    setEmail("");
+    setPassword("");
+  };
+
   return (
     <>
-      <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2 lg:mb-3">Create Account</h2>
-      <p className="text-gray-300 mb-8 lg:mb-10 text-base lg:text-lg">Start tracking like a pro</p>
+      <h2 className="text-3xl font-bold mb-2">Create Account</h2>
+      <p className="text-gray-400 mb-8">Start tracking like a pro</p>
 
-      <form className="space-y-6 lg:space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm lg:text-base font-medium text-gray-200 mb-3">Full Name</label>
-            <input
-              type="text"
-              defaultValue="John Doe"
-              className="w-full px-6 py-5 bg-white/20 hover:bg-white/25 border border-white/30 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-indigo-900 transition-colors duration-200 text-lg lg:text-xl"
-              placeholder="Enter full name"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm lg:text-base font-medium text-gray-200 mb-3">Profile Image</label>
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 ring-2 ring-white/30 shadow-lg shrink-0" />
-              <label className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-white/20 hover:bg-white/25 border border-white/30 text-white cursor-pointer transition-colors duration-200">
-                <svg className="w-5 h-5 text-pink-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                </svg>
-                <span className="text-sm lg:text-base font-medium">Upload</span>
-                <input type="file" accept="image/*" className="hidden" />
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm lg:text-base font-medium text-gray-200 mb-3">Email</label>
-            <input
-              type="email"
-              defaultValue="you@company.com"
-              className="w-full px-6 py-5 bg-white/20 hover:bg-white/25 border border-white/30 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-indigo-900 transition-colors duration-200 text-lg lg:text-xl"
-              placeholder="you@company.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm lg:text-base font-medium text-gray-200 mb-3">Password</label>
-            <input
-              type="password"
-              placeholder="Create strong password"
-              className="w-full px-6 py-5 bg-white/20 hover:bg-white/25 border border-white/30 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-indigo-900 transition-colors duration-200 text-lg lg:text-xl"
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="block text-gray-300 mb-2">Full Name</label>
+          <input
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className="w-full px-5 py-4 bg-[#0f172a] border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Enter full name"
+            required
+          />
         </div>
+
+        <div>
+          <label className="block text-gray-300 mb-2">Email</label>
+          <input
+            type="email"
+            value={emailAddress}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-5 py-4 bg-[#0f172a] border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="you@company.com"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 mb-2">Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-5 py-4 bg-[#0f172a] border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Create strong password"
+            required
+          />
+        </div>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-400 text-red-300 rounded-xl p-3 text-sm">
+            {typeof error === "string" ? error : error.message || "Something went wrong"}
+          </div>
+        )}
 
         <button
           type="submit"
-          className="w-full py-5 bg-gradient-to-r from-pink-600 to-purple-700 text-white font-bold rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-[1.02] active:scale-100 transition-transform duration-300 text-lg lg:text-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-purple-700"
+          className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition"
         >
           Create Account
         </button>
       </form>
 
-      <p className="mt-8 lg:mt-10 text-center text-gray-300 text-base lg:text-lg">
-        Already have account?{" "}
-        <Link to="/auth/login" className="text-pink-300 font-semibold hover:underline">
+      <p className="mt-6 text-center text-gray-400">
+        Already have an account?{" "}
+        <Link to="/" className="text-indigo-400 hover:underline">
           Log In
         </Link>
       </p>
