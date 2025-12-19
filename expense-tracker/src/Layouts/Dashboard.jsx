@@ -1,7 +1,7 @@
 // Dashboard.jsx
 import { useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
-import Sidebar from "../components/sidebar";
+import Sidebar from "../components/Sidebar";
 import { Menu, X } from "lucide-react"; 
 export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
