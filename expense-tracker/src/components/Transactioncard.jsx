@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function TransactionCard({
   title,
   transactions,
@@ -8,7 +6,7 @@ export default function TransactionCard({
 }) {
   return (
     <div className="bg-slate-800 rounded-2xl p-4 sm:p-6 border border-slate-700 shadow-lg w-full">
-      {/* Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
         <h3 className={`text-lg sm:text-xl font-semibold text-${color}-400`}>
           {title}
@@ -18,7 +16,6 @@ export default function TransactionCard({
         </span>
       </div>
 
-      {/* Transactions */}
       {transactions?.length > 0 ? (
         <div className="space-y-2 sm:space-y-3">
           {transactions.map((t) => (
@@ -26,7 +23,7 @@ export default function TransactionCard({
               key={t._id}
               className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-slate-700/50 rounded-xl hover:bg-slate-700 transition-colors duration-200"
             >
-              {/* Left */}
+            
               <div className="flex items-center gap-3 mb-2 sm:mb-0">
                 <div
                   className={`min-w-8 min-h-8 sm:w-9 sm:h-9 bg-${color}-500/20 rounded-lg flex items-center justify-center`}
@@ -45,7 +42,6 @@ export default function TransactionCard({
                 </div>
               </div>
 
-              {/* Right */}
               <p
                 className={`font-semibold text-${color}-400 text-sm sm:text-base`}
               >
