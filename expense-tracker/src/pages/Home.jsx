@@ -1,13 +1,18 @@
 import { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import CountUp from "react-countup";
+import { FaRupeeSign } from "react-icons/fa6";
 import TransactionCard from "../components/Transactioncard";
 import {
   ResponsiveContainer,
   RadialBarChart,
   RadialBar,
-  Tooltip as RadialBarTooltip,
+  PieChart,
+  Pie,
+  Cell,
   PolarAngleAxis,
-  LineChart,
+  AreaChart,
+  Area,
   Line,
   XAxis,
   YAxis,
@@ -18,23 +23,13 @@ import { openModal, closeModal } from "../features/modalslice";
 import Addexpense from "./Addexpense";
 import Addincome from "./Addincome";
 
-function formatDateKey(d) {
-  const dt = new Date(d);
-  const yyyy = dt.getFullYear();
-  const mm = String(dt.getMonth() + 1).padStart(2, "0");
-  const dd = String(dt.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
+/* ===== HELPERS ===== */
+const formatDateKey = (d) => new Date(d).toISOString().slice(0, 10);
 
-const COLORS = {
-  income: "#22c55e",
-  expense: "#fb7185",
-  accent: "#38bdf8",
-  background: "#0f172a",
-  card: "#1e293b",
-};
+/* ===== COLORS ===== */
+const COLORS = ["#22c55e", "#fb7185", "#38bdf8", "#a78bfa", "#facc15"];
 
-const Home = () => {
+export default function Home() {
   const dispatch = useDispatch();
   const dashboard = useSelector((s) => s.dashboard);
   const modal = useSelector((s) => s.modal);
@@ -43,239 +38,166 @@ const Home = () => {
   const incomeArr = dashboard?.income || [];
   const expenseArr = dashboard?.expense || [];
 
+  /* ===== 30 DAY TREND ===== */
   const chartData = useMemo(() => {
     const today = new Date();
-    const dateKeys = [];
-
-    for (let i = 29; i >= 0; i--) {
+    return [...Array(30)].map((_, i) => {
       const d = new Date(today);
-      d.setDate(today.getDate() - i);
-      dateKeys.push(formatDateKey(d));
-    }
+      d.setDate(today.getDate() - (29 - i));
+      const key = formatDateKey(d);
 
-    const byDate = Object.fromEntries(
-      dateKeys.map((k) => [
-        k,
-        {
-          date: k,
-          income: 0,
-          expense: 0,
-          shortDate: new Date(k).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          }),
-        },
-      ])
-    );
-
-    for (const t of incomeArr) {
-      const k = formatDateKey(t.createdAt || t.date || new Date());
-      if (byDate[k]) byDate[k].income += Number(t.amount || 0);
-    }
-
-    for (const t of expenseArr) {
-      const k = formatDateKey(t.createdAt || t.date || new Date());
-      if (byDate[k]) byDate[k].expense += Number(t.amount || 0);
-    }
-
-    return dateKeys.map((k) => byDate[k]);
+      return {
+        date: key,
+        shortDate: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        income: incomeArr
+          .filter((t) => formatDateKey(t.createdAt || t.date) === key)
+          .reduce((s, t) => s + Number(t.amount || 0), 0),
+        expense: expenseArr
+          .filter((t) => formatDateKey(t.createdAt || t.date) === key)
+          .reduce((s, t) => s + Number(t.amount || 0), 0),
+      };
+    });
   }, [incomeArr, expenseArr]);
 
+  /* ===== CATEGORY DONUT ===== */
+  const categoryData = useMemo(() => {
+    const map = {};
+    expenseArr.forEach((e) => {
+      map[e.category] = (map[e.category] || 0) + Number(e.amount || 0);
+    });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  }, [expenseArr]);
+
+  /* ===== RADIAL ===== */
   const max = Math.max(totalIncome, totalExpense, 1);
   const radialData = [
-    { name: "Income", value: totalIncome, fill: COLORS.income },
-    { name: "Expense", value: totalExpense, fill: COLORS.expense },
+    { name: "Income", value: totalIncome, fill: "#22c55e" },
+    { name: "Expense", value: totalExpense, fill: "#fb7185" },
   ];
 
-  const recentExpenses = expenseArr
-    .slice()
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5);
-
-  const recentIncome = incomeArr
-    .slice()
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 sm:p-6 lg:p-8 space-y-8">
+    <div className="space-y-10">
 
+      {/* ===== MODAL ===== */}
       {modal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-5 sm:p-6 w-full max-w-md relative">
-            <button
-              className="absolute top-3 right-3 text-slate-400 hover:text-white text-lg transition-colors"
-              onClick={() => dispatch(closeModal())}
-            >
-              ✕
-            </button>
-            {modal.type === "expense" && <Addexpense />}
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="relative w-full max-w-md rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl p-6">
+            <button onClick={() => dispatch(closeModal())} className="absolute top-4 right-4 text-white/70">✕</button>
             {modal.type === "income" && <Addincome />}
+            {modal.type === "expense" && <Addexpense />}
           </div>
         </div>
       )}
 
-      <div className="text-center sm:text-left space-y-1">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
-          Financial Dashboard
-        </h1>
-        <p className="text-slate-300 text-sm sm:text-base">
-          Track your income and expenses over the last 30 days
-        </p>
+      {/* ===== HEADER ===== */}
+      <div>
+        <h1 className="text-4xl font-black text-white">Dashboard Overview</h1>
+        <p className="text-gray-400">Smart financial insights at a glance</p>
       </div>
 
-      <div className="flex flex-wrap gap-3 sm:gap-4">
+      {/* ===== ACTIONS ===== */}
+      <div className="flex flex-wrap gap-4">
         <button
           onClick={() => dispatch(openModal("income"))}
-          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-green-500/25 w-full sm:w-auto"
-        >
-          <span>+</span>
-          <span>Add Income</span>
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow-lg">
+          + Add Income
         </button>
         <button
           onClick={() => dispatch(openModal("expense"))}
-          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-rose-500/25 w-full sm:w-auto"
-        >
-          <span>+</span>
-          <span>Add Expense</span>
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-lg">
+          + Add Expense
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {[{ label: "Total Income", value: totalIncome, color: "green" },
-          { label: "Total Expense", value: totalExpense, color: "rose" },
-          { label: "Balance", value: balance, color: "cyan" }
-        ].map((item) => (
-          <div
-            key={item.label}
-            className="bg-slate-800 rounded-2xl p-5 sm:p-6 border border-slate-700 shadow-lg flex flex-col items-center sm:items-start text-center sm:text-left"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`w-9 h-9 bg-${item.color}-500/20 rounded-lg flex items-center justify-center`}>
-                <span className={`text-${item.color}-400 text-lg`}>
-                  {item.label === "Balance" ? "⚖️" : item.label === "Total Income" ? "↑" : "↓"}
-                </span>
-              </div>
-              <h3 className="text-slate-300 text-sm font-medium">{item.label}</h3>
-            </div>
-            <p className={`text-2xl sm:text-3xl font-bold text-${item.color}-400`}>
-              ${item.value.toLocaleString()}
+      {/* ===== KPI ===== */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { label: "Total Income", value: totalIncome, color: "text-green-400" },
+          { label: "Total Expense", value: totalExpense, color: "text-rose-400" },
+          { label: "Balance", value: balance, color: "text-cyan-400" },
+        ].map((k) => (
+          <div key={k.label} className="rounded-3xl p-6 bg-white/5 border border-white/10">
+            <p className="text-gray-400 text-sm">{k.label}</p>
+            <p className={`text-3xl font-extrabold flex items-center gap-1 ${k.color}`}>
+              <FaRupeeSign />
+              <CountUp end={k.value} duration={1.4} separator="," />
             </p>
           </div>
         ))}
       </div>
 
-<div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 min-w-0">
+      {/* ===== CHARTS ===== */}
+      <div className="grid xl:grid-cols-3 gap-8">
 
-  <div className="bg-slate-800 rounded-2xl p-5 sm:p-6 border border-slate-700 shadow-lg flex flex-col min-w-0">
-    <h3 className="text-lg font-semibold text-white mb-4 text-center">
-      Income vs Expense
-    </h3>
-    <div className="h-72 sm:h-80 md:h-96 w-full min-w-0">
-      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-        <RadialBarChart
-          innerRadius="40%"
-          outerRadius="90%"
-          data={radialData}
-          startAngle={180}
-          endAngle={0}
-        >
-          <PolarAngleAxis type="number" domain={[0, max]} tick={false} />
-          <RadialBar
-            minAngle={15}
-            background
-            clockWise
-            dataKey="value"
-            cornerRadius={8}
-          />
-          <RadialBarTooltip
-            formatter={(value) => [`$${value.toLocaleString()}`, "Amount"]}
-            contentStyle={{
-              backgroundColor: "#1e293b",
-              border: "none",
-              borderRadius: "8px",
-              color: "white",
-            }}
-          />
-          <text
-            x="50%"
-            y="45%"
-            textAnchor="middle"
-            fill="white"
-            fontSize="18"
-            fontWeight="bold"
-          >
-            ${balance.toLocaleString()}
-          </text>
-          <text
-            x="50%"
-            y="55%"
-            textAnchor="middle"
-            fill="#94a3b8"
-            fontSize="13"
-          >
-            Balance
-          </text>
-        </RadialBarChart>
-      </ResponsiveContainer>
-    </div>
+        {/* RADIAL */}
+        <div className="xl:col-span-1 bg-white/5 p-6 rounded-3xl border border-white/10">
+          <h3 className="text-center text-white font-semibold mb-4">Income vs Expense</h3>
+          <div className="h-72">
+            <ResponsiveContainer>
+              <RadialBarChart data={radialData} innerRadius="60%" outerRadius="100%" startAngle={210} endAngle={-30}>
+                <PolarAngleAxis type="number" domain={[0, max]} tick={false} />
+                <RadialBar dataKey="value" cornerRadius={15} />
+                <text x="50%" y="50%" textAnchor="middle" fill="white" fontSize="22" fontWeight="700">
+                  Rs.{balance.toLocaleString()}
+                </text>
+              </RadialBarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-    <div className="flex justify-center gap-5 mt-4 text-sm">
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-green-500 rounded-full" />
-        <span className="text-slate-300">Income</span>
+        {/* LINE + AREA */}
+        <div className="xl:col-span-2 bg-white/5 p-6 rounded-3xl border border-white/10">
+          <h3 className="text-center text-white font-semibold mb-4">30-Day Trend</h3>
+          <div className="h-80">
+            <ResponsiveContainer>
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="incomeG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#22c55e" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="#22c55e" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 10" stroke="#334155" />
+                <XAxis dataKey="shortDate" tick={{ fill: "#9ca3af", fontSize: 11 }} />
+                <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} />
+                <Tooltip />
+                <Area type="monotone" dataKey="income" stroke="#22c55e" fill="url(#incomeG)" />
+                <Line
+                  type="monotone"
+                  dataKey="expense"
+                  stroke="#fb7185"
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: "#fb7185" }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-rose-500 rounded-full" />
-        <span className="text-slate-300">Expense</span>
-      </div>
-    </div>
-  </div>
 
-  <div className="bg-slate-800 rounded-2xl p-5 sm:p-6 border border-slate-700 shadow-lg flex flex-col min-w-0">
-    <h3 className="text-lg font-semibold text-white mb-4 text-center">
-      30-Day Trend
-    </h3>
-    <div className="h-72 sm:h-80 md:h-96 w-full min-w-0">
-      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-        <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis dataKey="shortDate" stroke="#94a3b8" fontSize={11} />
-          <YAxis stroke="#94a3b8" fontSize={11} />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "#1e293b",
-              border: "none",
-              borderRadius: "8px",
-              color: "white",
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="income"
-            stroke="#22c55e"
-            strokeWidth={2}
-            dot={{ fill: "#22c55e" }}
-          />
-          <Line
-            type="monotone"
-            dataKey="expense"
-            stroke="#fb7185"
-            strokeWidth={2}
-            dot={{ fill: "#fb7185" }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  </div>
-</div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <TransactionCard title="Recent Expenses" transactions={recentExpenses} type="expense" color="rose" />
-        <TransactionCard title="Recent Income" transactions={recentIncome} type="income" color="green" />
+      {/* ===== DONUT ===== */}
+      <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
+        <h3 className="text-center text-white font-semibold mb-4">Expense Categories</h3>
+        <div className="h-72">
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie data={categoryData} innerRadius={70} outerRadius={110} dataKey="value">
+                {categoryData.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
+
+      {/* ===== TRANSACTIONS ===== */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <TransactionCard title="Recent Expenses" transactions={expenseArr.slice(0, 5)} type="expense" />
+        <TransactionCard title="Recent Income" transactions={incomeArr.slice(0, 5)} type="income" />
+      </div>
+
     </div>
   );
-};
-
-export default Home;
+}

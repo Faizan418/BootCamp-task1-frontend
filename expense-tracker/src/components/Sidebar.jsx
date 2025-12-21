@@ -1,38 +1,95 @@
 import { NavLink } from "react-router-dom";
+import { House } from "lucide-react";
+import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
+import { VscAccount } from "react-icons/vsc";
+
+const navItems = [
+  { to: "/dashboard", label: "Dashboard", icon: House },
+  { to: "/dashboard/income", label: "Income", icon: FaArrowTrendUp },
+  { to: "/dashboard/expenses", label: "Expenses", icon: FaArrowTrendDown },
+  { to: "/dashboard/profile", label: "Profile", icon: VscAccount },
+];
 
 export default function Sidebar() {
   return (
-    <aside className="h-screen w-64 hidden md:flex flex-col sticky top-0 bg-[#111827]/95 backdrop-blur border-r border-slate-700/60 text-white">
-      <div className="px-6 py-6 border-b border-slate-700/60">
-        <h1 className="text-2xl font-bold tracking-tight">
-          Expense<span className="text-pink-400">Tracker</span>
+    <aside className="hidden md:flex h-screen w-72 sticky top-0 z-40
+      bg-white/5 backdrop-blur-2xl border-r border-white/10
+      text-white flex-col">
+
+      {/* ===== BRAND ===== */}
+      <div className="px-8 py-7 border-b border-white/10">
+        <h1 className="text-3xl font-black tracking-tight">
+          <span className="bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
+            Expense
+          </span>
+          <span className="text-pink-400">Tracker</span>
         </h1>
-        <p className="text-sm text-gray-400 mt-1">Dashboard</p>
+        <p className="text-sm text-gray-400 mt-1 tracking-wide">
+          Smart Finance Dashboard
+        </p>
       </div>
-      <nav className="flex-1 px-4 py-6 space-y-2">
-        {[
-          { to: "/dashboard", icon: "🏠", label: "Home" },
-          { to: "/dashboard/income", icon: "💰", label: "Income" },
-          { to: "/dashboard/expenses", icon: "💸", label: "Expenses" },
-          { to: "/dashboard/profile", icon: "👤", label: "Profile" },
-        ].map((link) => (
+
+      {/* ===== NAVIGATION ===== */}
+      <nav className="flex-1 px-4 py-8 space-y-2">
+        {navItems.map(({ to, label, icon: Icon }) => (
           <NavLink
-            key={link.to}
-            to={link.to}
+            key={to}
+            to={to}
             end
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 border ` +
-              (isActive
-                ? "bg-pink-500/20 text-pink-300 border-pink-400/30 cursor-default"
-                : "text-gray-300 border-transparent hover:text-pink-300 hover:bg-white/5")
+              `
+              group relative flex items-center gap-4 px-5 py-3.5 rounded-xl
+              transition-all duration-300 overflow-hidden
+              ${
+                isActive
+                  ? "bg-gradient-to-r from-pink-500/20 to-purple-500/10 text-pink-300"
+                  : "text-gray-300 hover:text-white hover:bg-white/5"
+              }
+              `
             }
           >
-            {link.icon} <span className="font-medium">{link.label}</span>
+            {/* Active Glow Bar */}
+            <span
+              className={`
+                absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-full
+                transition-all duration-300
+                ${
+                  location.pathname === to
+                    ? "bg-gradient-to-b from-pink-400 to-purple-500 opacity-100"
+                    : "opacity-0 group-hover:opacity-40 bg-white"
+                }
+              `}
+            />
+
+            {/* Icon */}
+            <div
+              className={`
+                text-xl transition-all duration-300
+                group-hover:scale-110
+                ${
+                  location.pathname === to
+                    ? "text-pink-400 drop-shadow-[0_0_12px_rgba(236,72,153,0.6)]"
+                    : "text-gray-400 group-hover:text-pink-300"
+                }
+              `}
+            >
+              <Icon />
+            </div>
+
+            {/* Label */}
+            <span className="font-medium tracking-wide">{label}</span>
           </NavLink>
         ))}
       </nav>
-      <div className="px-6 py-4 border-t border-slate-700/60 text-sm text-gray-400">
-        © {new Date().getFullYear()} ExpenseTracker <br /> Created by Muhammad Faizan
+
+      {/* ===== FOOTER ===== */}
+      <div className="px-8 py-5 border-t border-white/10 text-xs text-gray-400 space-y-2">
+        <p>
+          © {new Date().getFullYear()} ExpenseTracker
+        </p>
+        <p className="italic text-gray-500">
+          Crafted by <span className="text-pink-400">Muhammad Faizan</span>
+        </p>
       </div>
     </aside>
   );

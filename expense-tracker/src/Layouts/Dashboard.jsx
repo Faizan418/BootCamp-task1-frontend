@@ -21,7 +21,7 @@ export default function Dashboard() {
       <div className="md:hidden fixed top-0 left-0 w-full bg-[#111827]/95 backdrop-blur border-b border-slate-700/60 z-50">
         <div className="flex justify-between items-center px-5 py-4">
           <h1 className="text-xl font-bold tracking-tight">
-            Expense<span className="text-pink-400">Pro</span>
+            Expense<span className="text-pink-400">Tracker</span>
           </h1>
           <button
             className="text-slate-300 hover:text-white transition"
