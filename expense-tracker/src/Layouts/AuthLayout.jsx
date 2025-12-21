@@ -26,7 +26,7 @@ export default function AuthLayout() {
               <span className="bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
                 Expense
               </span>
-              <span className="text-pink-400">Pro</span>
+              <span className="text-pink-400">Tracker</span>
             </h1>
             <p className="mt-6 text-xl lg:text-2xl text-gray-300 font-light max-w-lg mx-auto lg:mx-0">
               The only expense tracker you'll ever need.

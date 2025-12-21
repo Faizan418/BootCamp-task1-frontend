@@ -5,7 +5,7 @@ export default function Sidebar() {
     <aside className="h-screen w-64 hidden md:flex flex-col sticky top-0 bg-[#111827]/95 backdrop-blur border-r border-slate-700/60 text-white">
       <div className="px-6 py-6 border-b border-slate-700/60">
         <h1 className="text-2xl font-bold tracking-tight">
-          Expense<span className="text-pink-400">Pro</span>
+          Expense<span className="text-pink-400">Tracker</span>
         </h1>
         <p className="text-sm text-gray-400 mt-1">Dashboard</p>
       </div>
@@ -32,7 +32,7 @@ export default function Sidebar() {
         ))}
       </nav>
       <div className="px-6 py-4 border-t border-slate-700/60 text-sm text-gray-400">
-        © {new Date().getFullYear()} ExpensePro
+        © {new Date().getFullYear()} ExpenseTracker <br /> Created by Muhammad Faizan
       </div>
     </aside>
   );
