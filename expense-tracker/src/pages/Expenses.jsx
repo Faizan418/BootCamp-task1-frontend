@@ -40,12 +40,14 @@ if (window.confirm("Are you sure you want to delete this expense?")) {
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-          <div className="flex-1 sm:flex-none rounded-2xl bg-[#111827]/70 border border-slate-700/60 px-5 py-4 text-right">
+          <div className="flex-1 sm:flex-none rounded-2xl bg-gradient-to-br from-rose-500/10 to-rose-500/5 
+border border-rose-500/30 px-5 py-4 text-right">
             <p className="text-sm text-gray-300">Total Expense (This Month)</p>
             <p className="text-3xl font-extrabold text-rose-400 mt-1">
               ${totalExpense.toLocaleString()}
             </p>
           </div>
+
 
           <button
             onClick={() => handleDownloadExcel(expenses , "expense")}

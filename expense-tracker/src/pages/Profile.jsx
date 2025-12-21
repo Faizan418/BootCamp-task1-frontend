@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { LogOut, ShieldCheck, Mail, User } from "lucide-react";
 import { logout } from "../features/authslice";
 
 export default function Profile() {
@@ -11,6 +12,7 @@ export default function Profile() {
   const profileImg =
     user?.profileImg ||
     "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
   const createdAt = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString()
     : "—";
@@ -19,79 +21,121 @@ export default function Profile() {
     : "—";
 
   return (
-    <div className="space-y-9 text-white animate-fadeIn">
-   
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-[#0b1220]/70 backdrop-blur-md border border-slate-700/60 rounded-2xl p-6 shadow-lg hover:shadow-pink-500/10 transition-all duration-300">
-        <img
-          src={profileImg}
-          alt="avatar"
-          className="h-24 w-24 rounded-full ring-2 ring-pink-400/40 object-cover hover:scale-105 transition-transform duration-300"
-        />
+    <div className="space-y-12 text-white animate-fadeIn">
 
-        <div className="flex-1 text-center sm:text-left">
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            {fullName}
-          </h1>
-          <p className="text-gray-400">{email}</p>
+      {/* ================= HERO PROFILE ================= */}
+      <div className="relative rounded-[28px] overflow-hidden border border-slate-700/60 bg-[#020617]/90 shadow-2xl">
+
+        {/* Background gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-cyan-500/10" />
+        <div className="absolute -top-24 -right-24 h-72 w-72 bg-pink-500/20 blur-3xl rounded-full" />
+
+        <div className="relative p-10 flex flex-col lg:flex-row items-center gap-8">
+          
+          {/* Avatar */}
+          <div className="relative">
+            <img
+              src={profileImg}
+              alt="profile"
+              className="h-32 w-32 rounded-full object-cover ring-4 ring-pink-500/40 shadow-xl"
+            />
+            <span className="absolute bottom-2 right-2 h-4 w-4 rounded-full bg-emerald-400 ring-4 ring-[#020617]" />
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 text-center lg:text-left">
+            <h1 className="text-4xl font-bold tracking-tight">
+              {fullName}
+            </h1>
+            <p className="text-gray-400 mt-2 flex items-center justify-center lg:justify-start gap-2">
+              <Mail className="w-4 h-4" />
+              {email}
+            </p>
+
+            <div className="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full 
+            bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm">
+              <ShieldCheck className="w-4 h-4" />
+              Verified & Active
+            </div>
+          </div>
+
+          {/* Logout */}
+          <button
+            onClick={() => dispatch(logout())}
+            disabled={loading}
+            className="flex items-center gap-2 px-7 py-3 rounded-xl 
+            bg-gradient-to-r from-rose-600 to-pink-700 
+            text-white font-medium shadow-xl 
+            hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+          >
+            <LogOut className="w-4 h-4" />
+            {loading ? "Logging out..." : "Logout"}
+          </button>
         </div>
-
-        <button
-          onClick={() => dispatch(logout())}
-          disabled={loading}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-700 text-white font-medium shadow-lg hover:opacity-90 transition-all disabled:opacity-50"
-        >
-          {loading ? "Logging out..." : "Logout"}
-        </button>
       </div>
 
+      {/* ================= ERROR ================= */}
       {error && (
-        <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-rose-200 text-center font-medium animate-fadeIn">
+        <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-rose-200 text-center font-medium">
           {String(error)}
         </div>
       )}
 
+      {/* ================= STATS ================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="rounded-2xl bg-gradient-to-br from-[#111827]/80 to-[#0b1220]/70 border border-slate-700/60 p-6 shadow-inner hover:shadow-cyan-500/10 transition-all">
-          <p className="text-sm text-gray-400">Member since</p>
-          <p className="mt-1 text-2xl font-semibold text-fuchsia-300">
-            {createdAt}
-          </p>
-        </div>
-        <div className="rounded-2xl bg-gradient-to-br from-[#111827]/80 to-[#0b1220]/70 border border-slate-700/60 p-6 shadow-inner hover:shadow-fuchsia-500/10 transition-all">
-          <p className="text-sm text-gray-400">Last updated</p>
-          <p className="mt-1 text-2xl font-semibold text-cyan-300">
-            {updatedAt}
-          </p>
-        </div>
+        <PremiumStat
+          title="Member Since"
+          value={createdAt}
+          accent="from-fuchsia-500/20 to-purple-500/5"
+        />
+        <PremiumStat
+          title="Last Updated"
+          value={updatedAt}
+          accent="from-cyan-500/20 to-blue-500/5"
+        />
       </div>
 
-      <div className="rounded-2xl bg-gradient-to-br from-[#111827]/80 to-[#0b1220]/70 border border-slate-700/60 p-8 shadow-lg hover:shadow-pink-500/10 transition-all">
-        <h2 className="text-2xl font-semibold mb-6 text-white tracking-tight">
-          Account Details
+      {/* ================= ACCOUNT DETAILS ================= */}
+      <div className="rounded-[28px] border border-slate-700/60 
+      bg-[#020617]/90 p-10 shadow-2xl">
+
+        <h2 className="text-3xl font-semibold mb-10 tracking-tight">
+          Account Information
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">
-              Full Name
-            </label>
-            <input
-              type="text"
-              defaultValue={fullName}
-              className="w-full px-4 py-3 rounded-xl bg-[#0b1220]/90 border border-slate-700/60 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500/40 transition-all"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">Email</label>
-            <input
-              type="email"
-              defaultValue={email}
-              className="w-full px-4 py-3 rounded-xl bg-[#0b1220]/90 border border-slate-700/60 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 transition-all"
-              readOnly
-            />
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <PremiumField icon={User} label="Full Name" value={fullName} />
+          <PremiumField icon={Mail} label="Email Address" value={email} />
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= COMPONENTS ================= */
+
+function PremiumStat({ title, value, accent }) {
+  return (
+    <div className={`relative overflow-hidden rounded-2xl border border-slate-700/60 
+    bg-gradient-to-br ${accent} bg-[#020617]/80 p-7 shadow-inner`}>
+      <p className="text-sm text-gray-400">{title}</p>
+      <p className="mt-2 text-3xl font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
+function PremiumField({ label, value, icon: Icon }) {
+  return (
+    <div>
+      <label className="block text-sm text-gray-400 mb-2">{label}</label>
+      <div className="flex items-center gap-3 px-4 py-3 rounded-xl 
+      bg-[#020617]/90 border border-slate-700/60">
+        <Icon className="w-5 h-5 text-gray-500" />
+        <input
+          readOnly
+          value={value}
+          className="flex-1 bg-transparent text-white focus:outline-none cursor-default"
+        />
       </div>
     </div>
   );

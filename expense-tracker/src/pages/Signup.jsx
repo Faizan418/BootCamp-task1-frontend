@@ -45,7 +45,7 @@ export default function SignupPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Profile Photo */}
-        <div className="flex justify-center">
+        {/* <div className="flex justify-center">
           <label className="cursor-pointer group">
             <div className="relative">
               <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-white/10 group-hover:ring-purple-400 transition">
@@ -73,7 +73,7 @@ export default function SignupPage() {
               className="hidden"
             />
           </label>
-        </div>
+        </div> */}
 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
