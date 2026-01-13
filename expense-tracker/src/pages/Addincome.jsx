@@ -2,131 +2,139 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { add, fetchDashboardData } from "../features/dashboardslice";
 import { closeModal } from "../features/modalslice";
+import toast from "react-hot-toast";
 
-const ICONS = [
-  "💼", "🏦", "🎯", "📈", "🧾", "💸", "🏆", "🎉", "🌟", "🚀", "👔", "🎶"
-];
+const ICONS = ["💼","🏦","🎯","📈","🧾","💸","🏆","🎉","🌟","🚀","👔","🎶"];
 
 export default function Addincome() {
   const [source, setSource] = useState("");
-  const [icon, setIcon] = useState("");
+  const [icon, setIcon] = useState("💼");
   const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const dispatch = useDispatch();
+  const [date, setDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
 
-  function handleIconClick(emoji) {
-    setIcon(emoji);
-  }
+  const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (amount <= 0) {
-      return alert("DONT ADD NEGATIVE VALUE")
+      return toast.error("Amount must be greater than 0");
     }
-    const obj = { source, icon, amount, date };
-dispatch(add({ show: "income", payload: obj }))
-  .unwrap() 
-  .then(() => {
-    dispatch(fetchDashboardData());
-    dispatch(closeModal());
-  })
-  .catch((err) => {
-    console.error("Error adding income:", err);
-  });
+
+    const loadingToast = toast.loading("Adding income...");
+
+    dispatch(
+      add({
+        show: "income",
+        payload: { source, icon, amount, date },
+      })
+    )
+      .unwrap()
+      .then(() => {
+        toast.success("Income added successfully", { id: loadingToast });
+        dispatch(fetchDashboardData());
+        dispatch(closeModal());
+      })
+      .catch(() => {
+        toast.error("Failed to add income", { id: loadingToast });
+      });
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 bg-[#181A25] p-2 rounded-2xl"
+      className="w-full max-w-sm mx-auto p-5 rounded-2xl
+      bg-[#141625] border border-white/10 shadow-2xl"
     >
-      <h2 className="text-xl font-bold text-green-400 mb-2">Add Income</h2>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-gray-300 mb-1 text-sm">Source</label>
-          <input
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            placeholder="Salary, Freelance, Bonus..."
-            className="w-full px-4 py-3 bg-[#212334] border border-slate-700/50 rounded-xl 
-                       text-white placeholder-gray-500 focus:outline-none 
-                       focus:ring-2 focus:ring-green-500/40 transition-all"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-300 mb-1 text-sm">Icon</label>
-          <div className="flex flex-wrap gap-2 mb-2">
-            {ICONS.map((emoji) => (
-              <button
-                key={emoji}
-                type="button"
-                onClick={() => handleIconClick(emoji)}
-                className={`text-2xl w-10 h-10 rounded-lg border-2 flex items-center justify-center
-                transition-all duration-200
-                ${
-                  icon === emoji
-                    ? "bg-green-500/20 border-green-400/60 scale-105"
-                    : "bg-[#23263a] border-slate-600 hover:bg-green-500/10"
-                }`}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-          <input
-            value={icon}
-            onChange={(e) => setIcon(e.target.value)}
-            placeholder="💼"
-            maxLength={2}
-            className="w-full px-4 py-3 bg-[#212334] border border-slate-700/50 rounded-xl 
-                       text-white placeholder-gray-500 focus:outline-none 
-                       focus:ring-2 focus:ring-green-500/30 transition-all text-2xl"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-300 mb-1 text-sm">Amount</label>
-          <input
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0"
-            type="number"
-            min="0"
-            step="0.01"
-            className="w-full px-4 py-3 bg-[#212334] border border-slate-700/50 rounded-xl 
-                       text-white placeholder-gray-500 focus:outline-none 
-                       focus:ring-2 focus:ring-green-500/30 transition-all"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-300 mb-1 text-sm">Date</label>
-          <input
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            type="date"
-            max={new Date().toISOString().slice(0, 10)}
-            className="w-full px-4 py-3 bg-[#212334] border border-slate-700/50 rounded-xl 
-                       text-white focus:outline-none focus:ring-2 
-                       focus:ring-green-500/30 transition-all"
-            required
-          />
-        </div>
-
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-green-400 font-semibold text-lg">
+          New Income
+        </h2>
         <button
-          type="submit"
-          className="w-full py-3 mt-1 rounded-xl font-semibold text-white 
-                     bg-gradient-to-r from-green-500/60 to-cyan-500/60 
-                     hover:from-green-400/90 hover:to-cyan-400/80 
-                     transition-all drop-shadow shadow-green-500/10"
+          type="button"
+          onClick={() => dispatch(closeModal())}
+          className="text-gray-400 hover:text-white"
         >
-          Add Income
+          ✕
         </button>
       </div>
+
+      {/* ICON PREVIEW */}
+      <div className="flex justify-center mb-4">
+        <div
+          className="w-16 h-16 rounded-full bg-green-500/15
+          flex items-center justify-center text-3xl
+          border border-green-400/30"
+        >
+          {icon}
+        </div>
+      </div>
+
+      {/* ICON PICKER */}
+      <div className="flex flex-wrap justify-center gap-2 mb-5">
+        {ICONS.map((e) => (
+          <button
+            key={e}
+            type="button"
+            onClick={() => setIcon(e)}
+            className={`w-9 h-9 rounded-full text-lg transition
+            ${
+              icon === e
+                ? "bg-green-500 text-black"
+                : "bg-[#1f2238] text-white hover:bg-white/10"
+            }`}
+          >
+            {e}
+          </button>
+        ))}
+      </div>
+
+      {/* AMOUNT */}
+      <input
+        type="number"
+        placeholder="Amount"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        className="w-full text-center text-2xl font-semibold
+        bg-[#1f2238] py-3 rounded-xl mb-4
+        text-white placeholder-gray-500
+        focus:ring-2 focus:ring-green-500 outline-none"
+        required
+      />
+
+      {/* SOURCE */}
+      <input
+        placeholder="Source (Salary, Freelance)"
+        value={source}
+        onChange={(e) => setSource(e.target.value)}
+        className="w-full bg-[#1f2238] py-2.5 px-3 rounded-xl mb-3
+        text-white placeholder-gray-500
+        focus:ring-2 focus:ring-green-500 outline-none"
+        required
+      />
+
+      {/* DATE */}
+      <input
+        type="date"
+        value={date}
+        max={new Date().toISOString().slice(0, 10)}
+        onChange={(e) => setDate(e.target.value)}
+        className="w-full bg-[#1f2238] py-2.5 px-3 rounded-xl mb-5
+        text-white focus:ring-2 focus:ring-green-500 outline-none"
+        required
+      />
+
+      {/* CTA */}
+      <button
+        type="submit"
+        className="w-full py-3 rounded-xl font-semibold
+        bg-green-500 text-black hover:bg-green-400 transition"
+      >
+        Add Income
+      </button>
     </form>
   );
 }

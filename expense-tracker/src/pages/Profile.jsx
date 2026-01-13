@@ -127,14 +127,14 @@ function PremiumStat({ title, value, accent }) {
 function PremiumField({ label, value, icon: Icon }) {
   return (
     <div>
-      <label className="block text-sm text-gray-400 mb-2">{label}</label>
+      <label className="block text-sm text-gray-200 mb-2">{label}</label>
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl 
-      bg-[#020617]/90 border border-slate-700/60">
+      bg-[#020617]/90 border border-slate-700/60 text-gray-400">
         <Icon className="w-5 h-5 text-gray-500" />
         <input
           readOnly
           value={value}
-          className="flex-1 bg-transparent text-white focus:outline-none cursor-default"
+          className="flex-1 bg-transparent  focus:outline-none cursor-not-allowed"
         />
       </div>
     </div>

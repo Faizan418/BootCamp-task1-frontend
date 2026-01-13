@@ -7,10 +7,10 @@ export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const links = [
-    { to: "/dashboard", icon: "🏠", label: "Home" },
-    { to: "/dashboard/income", icon: "💰", label: "Income" },
-    { to: "/dashboard/expenses", icon: "💸", label: "Expenses" },
-    { to: "/dashboard/profile", icon: "👤", label: "Profile" },
+    { to: "/dashboard", label: "Home" },
+    { to: "/dashboard/income", label: "Income" },
+    { to: "/dashboard/expenses", label: "Expenses" },
+    { to: "/dashboard/profile", label: "Profile" },
   ];
 
   return (

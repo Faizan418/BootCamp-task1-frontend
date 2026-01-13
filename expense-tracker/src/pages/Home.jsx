@@ -22,6 +22,15 @@ import {
 import { openModal, closeModal } from "../features/modalslice";
 import Addexpense from "./Addexpense";
 import Addincome from "./Addincome";
+import { Toaster } from "react-hot-toast";
+ <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            zIndex: 99999, // ✅ modal ke upar
+          },
+        }}
+      />
 
 /* ===== HELPERS ===== */
 const formatDateKey = (d) => new Date(d).toISOString().slice(0, 10);
@@ -77,17 +86,49 @@ export default function Home() {
 
   return (
     <div className="space-y-10">
+       <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            zIndex: 99999, // ✅ modal ke upar
+          },
+        }}
+      />
 
       {/* ===== MODAL ===== */}
       {modal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="relative w-full max-w-md rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl p-6">
-            <button onClick={() => dispatch(closeModal())} className="absolute top-4 right-4 text-white/70">✕</button>
-            {modal.type === "income" && <Addincome />}
-            {modal.type === "expense" && <Addexpense />}
-          </div>
-        </div>
-      )}
+  <div
+    className="
+      fixed inset-0 z-50  h-full
+      backdrop-blur-sm
+      flex items-center justify-center
+      px-4
+    "
+  >
+    
+      {/* Close Button */}
+      <button
+        onClick={() => dispatch(closeModal())}
+        className="
+          absolute top-3 right-3
+          w-8 h-8
+          rounded-full
+          bg-white/10
+          text-white/70
+          flex items-center justify-center
+          hover:bg-white/20 hover:text-white
+          transition
+        "
+      >
+        ✕
+      </button>
+
+      {modal.type === "income" && <Addincome />}
+      {modal.type === "expense" && <Addexpense />}
+    </div>
+
+)}
+
 
       {/* ===== HEADER ===== */}
       <div>

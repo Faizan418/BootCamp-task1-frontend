@@ -39,7 +39,7 @@ export default function Income() {
           dispatch(fetchDashboardData());
         })
         .catch((err) => console.error(err));
-    }
+      }
   };
 
   return (

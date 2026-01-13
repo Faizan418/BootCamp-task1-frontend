@@ -16,6 +16,9 @@ import { checkAuth } from "./features/authslice";
 import { fetchDashboardData } from "./features/dashboardslice";
 import Addexpense from "./pages/Addexpense";
 import Addincome from "./pages/Addincome";
+
+
+
 const router = createBrowserRouter([
   {
     path: "/",
