@@ -16,6 +16,10 @@ import { checkAuth } from "./features/authslice";
 import { fetchDashboardData } from "./features/dashboardslice";
 import Addexpense from "./pages/Addexpense";
 import Addincome from "./pages/Addincome";
+import ForgotPassword from "./pages/ForgotPassword";
+import VerifyOtp from "./pages/VerifyOtp";
+import ResetPassword from "./pages/ResetPassword";
+
 
 
 
@@ -31,6 +35,18 @@ const router = createBrowserRouter([
       {
         path: "signup",
         element: <Signup />,
+      },
+      {
+        path: "forgot-Password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "verify-otp",
+        element: <VerifyOtp />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
       },
     ],
   },

@@ -66,7 +66,6 @@ export const deleteIncomeExpense = createAsyncThunk(
 );
 
 
-// payload = data jo API ko bhejna hai
 export const add = createAsyncThunk(
   "addincome/expense",
   async ({ show, payload }, { rejectWithValue }) => {
