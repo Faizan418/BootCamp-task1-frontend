@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CountUp from "react-countup";
 import { FaRupeeSign } from "react-icons/fa6";
+import { Plus, Wallet, TrendingUp, TrendingDown, LayoutDashboard, X, PieChart as PieIcon } from "lucide-react";
 import TransactionCard from "../components/Transactioncard";
 import {
   ResponsiveContainer,
@@ -13,7 +14,6 @@ import {
   PolarAngleAxis,
   AreaChart,
   Area,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -23,20 +23,10 @@ import { openModal, closeModal } from "../features/modalslice";
 import Addexpense from "./Addexpense";
 import Addincome from "./Addincome";
 import { Toaster } from "react-hot-toast";
- <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            zIndex: 99999, // ✅ modal ke upar
-          },
-        }}
-      />
+import { motion, AnimatePresence } from "framer-motion";
 
-/* ===== HELPERS ===== */
 const formatDateKey = (d) => new Date(d).toISOString().slice(0, 10);
-
-/* ===== COLORS ===== */
-const COLORS = ["#22c55e", "#fb7185", "#38bdf8", "#a78bfa", "#facc15"];
+const COLORS = ["#10b981", "#fb7185", "#3b82f6", "#a855f7", "#eab308"];
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -47,207 +37,184 @@ export default function Home() {
   const incomeArr = dashboard?.income || [];
   const expenseArr = dashboard?.expense || [];
 
-  /* ===== 30 DAY TREND ===== */
   const chartData = useMemo(() => {
     const today = new Date();
     return [...Array(30)].map((_, i) => {
       const d = new Date(today);
       d.setDate(today.getDate() - (29 - i));
       const key = formatDateKey(d);
-
       return {
-        date: key,
         shortDate: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-        income: incomeArr
-          .filter((t) => formatDateKey(t.createdAt || t.date) === key)
-          .reduce((s, t) => s + Number(t.amount || 0), 0),
-        expense: expenseArr
-          .filter((t) => formatDateKey(t.createdAt || t.date) === key)
-          .reduce((s, t) => s + Number(t.amount || 0), 0),
+        income: incomeArr.filter((t) => formatDateKey(t.createdAt || t.date) === key).reduce((s, t) => s + Number(t.amount || 0), 0),
+        expense: expenseArr.filter((t) => formatDateKey(t.createdAt || t.date) === key).reduce((s, t) => s + Number(t.amount || 0), 0),
       };
     });
   }, [incomeArr, expenseArr]);
 
-  /* ===== CATEGORY DONUT ===== */
   const categoryData = useMemo(() => {
     const map = {};
-    expenseArr.forEach((e) => {
-      map[e.category] = (map[e.category] || 0) + Number(e.amount || 0);
-    });
-    return Object.entries(map).map(([name, value]) => ({ name, value }));
+    expenseArr.forEach((e) => { map[e.category] = (map[e.category] || 0) + Number(e.amount || 0); });
+    return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a,b) => b.value - a.value);
   }, [expenseArr]);
 
-  /* ===== RADIAL ===== */
   const max = Math.max(totalIncome, totalExpense, 1);
   const radialData = [
-    { name: "Income", value: totalIncome, fill: "#22c55e" },
+    { name: "Income", value: totalIncome, fill: "#10b981" },
     { name: "Expense", value: totalExpense, fill: "#fb7185" },
   ];
 
   return (
-    <div className="space-y-10">
-       <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            zIndex: 99999, // ✅ modal ke upar
-          },
-        }}
-      />
+    <div className="space-y-10 pb-20">
+      <Toaster position="top-right" toastOptions={{ style: { zIndex: 99999 } }} />
 
-      {/* ===== MODAL ===== */}
-      {modal.isOpen && (
-  <div
-    className="
-      fixed inset-0 z-50  h-full
-      backdrop-blur-sm
-      flex items-center justify-center
-      px-4
-    "
-  >
-    
-      {/* Close Button */}
-      <button
-        onClick={() => dispatch(closeModal())}
-        className="
-          absolute top-3 right-3
-          w-8 h-8
-          rounded-full
-          bg-white/10
-          text-white/70
-          flex items-center justify-center
-          hover:bg-white/20 hover:text-white
-          transition
-        "
-      >
-        ✕
-      </button>
+      {/* ===== PREMIUM MODAL ===== */}
+      <AnimatePresence>
+        {modal.isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center h-[100%] justify-center p-4 backdrop-blur-md bg-black/30"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              className="relative w-full h-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              
+              <div className="p-8 custom-scrollbar max-h-[90vh] overflow-y-auto">
+                {modal.type === "income" ? <Addincome /> : <Addexpense />}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {modal.type === "income" && <Addincome />}
-      {modal.type === "expense" && <Addexpense />}
-    </div>
-
-)}
-
-
-      {/* ===== HEADER ===== */}
-      <div>
-        <h1 className="text-4xl font-black text-white">Dashboard Overview</h1>
-        <p className="text-gray-400">Smart financial insights at a glance</p>
+      {/* ===== HEADER & QUICK ACTIONS ===== */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-4xl font-black text-white tracking-tight flex items-center gap-3">
+            <LayoutDashboard className="text-indigo-500" /> Dashboard
+          </h1>
+          <p className="text-slate-500 font-medium mt-1">Welcome back! Here's your financial pulse.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => dispatch(openModal("income"))}
+            className="flex-1 md:flex-none px-6 py-3.5 rounded-2xl bg-emerald-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-95"
+          >
+            <Plus className="w-5 h-5" /> Add Income
+          </button>
+          <button
+            onClick={() => dispatch(openModal("expense"))}
+            className="flex-1 md:flex-none px-6 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-black text-sm flex items-center justify-center gap-2 hover:bg-white/10 transition-all active:scale-95"
+          >
+            <Plus className="w-5 h-5 text-rose-500" /> Add Expense
+          </button>
+        </div>
       </div>
 
-      {/* ===== ACTIONS ===== */}
-      <div className="flex flex-wrap gap-4">
-        <button
-          onClick={() => dispatch(openModal("income"))}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow-lg">
-          + Add Income
-        </button>
-        <button
-          onClick={() => dispatch(openModal("expense"))}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-lg">
-          + Add Expense
-        </button>
-      </div>
-
-      {/* ===== KPI ===== */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* ===== KPI CARDS ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: "Total Income", value: totalIncome, color: "text-green-400" },
-          { label: "Total Expense", value: totalExpense, color: "text-rose-400" },
-          { label: "Balance", value: balance, color: "text-cyan-400" },
+          { label: "Total Revenue", value: totalIncome, color: "text-emerald-400", icon: TrendingUp, bg: "bg-emerald-500/10" },
+          { label: "Total Spending", value: totalExpense, color: "text-rose-400", icon: TrendingDown, bg: "bg-rose-500/10" },
+          { label: "Net Balance", value: balance, color: "text-indigo-400", icon: Wallet, bg: "bg-indigo-500/10" },
         ].map((k) => (
-          <div key={k.label} className="rounded-3xl p-6 bg-white/5 border border-white/10">
-            <p className="text-gray-400 text-sm">{k.label}</p>
-            <p className={`text-3xl font-extrabold flex items-center gap-1 ${k.color}`}>
-              <FaRupeeSign />
-              <CountUp end={k.value} duration={1.4} separator="," />
+          <motion.div whileHover={{ y: -5 }} key={k.label} className="relative overflow-hidden rounded-[2rem] p-7 bg-white/[0.03] border border-white/10 shadow-xl">
+            <div className={`absolute -right-4 -top-4 w-24 h-24 blur-3xl rounded-full ${k.bg.replace('/10', '/20')}`} />
+            <div className="flex items-center gap-4 mb-4">
+               <div className={`p-3 rounded-xl ${k.bg} ${k.color}`}> <k.icon className="w-6 h-6" /> </div>
+               <p className="text-slate-500 font-black text-xs uppercase tracking-widest">{k.label}</p>
+            </div>
+            <p className={`text-3xl font-black flex items-center gap-1 ${k.color}`}>
+              <FaRupeeSign className="text-xl opacity-50" />
+              <CountUp end={k.value} duration={2} separator="," />
             </p>
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      {/* ===== CHARTS ===== */}
+      {/* ===== CHARTS SECTION ===== */}
       <div className="grid xl:grid-cols-3 gap-8">
-
-        {/* RADIAL */}
-        <div className="xl:col-span-1 bg-white/5 p-6 rounded-3xl border border-white/10">
-          <h3 className="text-center text-white font-semibold mb-4">Income vs Expense</h3>
-          <div className="h-72">
-            <ResponsiveContainer>
-              <RadialBarChart data={radialData} innerRadius="60%" outerRadius="100%" startAngle={210} endAngle={-30}>
-                <PolarAngleAxis type="number" domain={[0, max]} tick={false} />
-                <RadialBar dataKey="value" cornerRadius={15} />
-                <text x="50%" y="50%" textAnchor="middle" fill="white" fontSize="22" fontWeight="700">
-                  Rs.{balance.toLocaleString()}
-                </text>
-              </RadialBarChart>
-            </ResponsiveContainer>
+        {/* LINE TREND */}
+        <div className="xl:col-span-2 bg-white/[0.02] p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-white font-black uppercase tracking-widest text-sm">30-Day Cashflow</h3>
+            <div className="flex gap-4 text-[10px] font-black uppercase tracking-tighter">
+              <span className="flex items-center gap-1 text-emerald-400"><div className="w-2 h-2 rounded-full bg-emerald-400"/> Income</span>
+              <span className="flex items-center gap-1 text-rose-400"><div className="w-2 h-2 rounded-full bg-rose-400"/> Expense</span>
+            </div>
           </div>
-        </div>
-
-        {/* LINE + AREA */}
-        <div className="xl:col-span-2 bg-white/5 p-6 rounded-3xl border border-white/10">
-          <h3 className="text-center text-white font-semibold mb-4">30-Day Trend</h3>
           <div className="h-80">
             <ResponsiveContainer>
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="incomeG" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#22c55e" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#22c55e" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 10" stroke="#334155" />
-                <XAxis dataKey="shortDate" tick={{ fill: "#9ca3af", fontSize: 11 }} />
-                <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} />
-                <Tooltip />
-                <Area type="monotone" dataKey="income" stroke="#22c55e" fill="url(#incomeG)" />
-                <Line
-                  type="monotone"
-                  dataKey="expense"
-                  stroke="#fb7185"
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: "#fb7185" }}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                <XAxis dataKey="shortDate" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 10, fontWeight: 700 }} />
+                <YAxis hide />
+                <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #ffffff10', borderRadius: '16px' }} />
+                <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={3} fill="url(#incomeG)" />
+                <Area type="monotone" dataKey="expense" stroke="#fb7185" strokeWidth={3} fill="transparent" strokeDasharray="5 5" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
 
-      {/* ===== DONUT ===== */}
-      <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
-        <h3 className="text-center text-white font-semibold mb-4">Expense Categories</h3>
-        <div className="h-72">
-          <ResponsiveContainer>
-            <PieChart>
-              <Pie data={categoryData} innerRadius={70} outerRadius={110} dataKey="value">
-                {categoryData.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+        {/* RADIAL BALANCE */}
+        <div className="bg-white/[0.02] p-8 rounded-[2.5rem] border border-white/5 flex flex-col items-center justify-center relative overflow-hidden">
+          <h3 className="text-white font-black uppercase tracking-widest text-sm mb-4">Budget Ratio</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer>
+              <RadialBarChart data={radialData} innerRadius="65%" outerRadius="100%" startAngle={180} endAngle={0}>
+                <PolarAngleAxis type="number" domain={[0, max]} tick={false} />
+                <RadialBar dataKey="value" cornerRadius={20} />
+              </RadialBarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="text-center -mt-20">
+             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Available</p>
+             <p className="text-3xl font-black text-white">Rs.{balance.toLocaleString()}</p>
+          </div>
         </div>
       </div>
 
-      {/* ===== TRANSACTIONS ===== */}
-<div className="grid lg:grid-cols-2 gap-8">
-  <TransactionCard
-    title="Recent Expenses"
-    transactions={expenseArr.slice(0, 5)}
-    type="expense"
-  />
-  <TransactionCard
-    title="Recent Income"
-    transactions={incomeArr.slice(0, 5)}
-    type="income"
-  />
-</div>
+      {/* ===== CATEGORY & TRANSACTIONS ===== */}
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 bg-white/[0.02] p-8 rounded-[2.5rem] border border-white/5">
+          <div className="flex items-center gap-2 mb-8 text-white">
+            <PieIcon className="w-5 h-5 text-indigo-400" />
+            <h3 className="font-black uppercase tracking-widest text-sm">Top Expenses</h3>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer>
+              <PieChart>
+                <Pie data={categoryData} innerRadius={60} outerRadius={85} dataKey="value" paddingAngle={5}>
+                  {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="none" />)}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-4 space-y-2">
+            {categoryData.slice(0, 3).map((c, i) => (
+              <div key={i} className="flex justify-between text-xs font-bold">
+                <span className="text-slate-500 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} /> {c.name}
+                </span>
+                <span className="text-white">Rs.{c.value.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-
+        <div className="lg:col-span-2 grid md:grid-cols-2 gap-6">
+          <TransactionCard title="Recent Outflow" transactions={expenseArr} type="expense" />
+          <TransactionCard title="Recent Inflow" transactions={incomeArr} type="income" />
+        </div>
+      </div>
     </div>
   );
 }
