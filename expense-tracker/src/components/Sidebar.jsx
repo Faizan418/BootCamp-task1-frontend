@@ -12,13 +12,13 @@ const navItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="hidden md:flex h-screen w-72 sticky top-0 z-40
+    <aside className="hidden md:flex h-screen w-62 sticky top-0 z-40
       bg-white/5 backdrop-blur-2xl border-r border-white/10
       text-white flex-col">
 
       {/* ===== BRAND ===== */}
-      <div className="px-8 py-7 border-b border-white/10">
-        <h1 className="text-3xl font-black tracking-tight">
+      <div className="px-5 py-6 border-b border-white/10">
+        <h1 className="text-2xl font-black tracking-tight">
           <span className="bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
             Expense
           </span>

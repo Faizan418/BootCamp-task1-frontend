@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/axios";
+import { api } from "../api";
 import toast from "react-hot-toast";
 
 export default function VerifyOtp() {
@@ -50,7 +50,7 @@ export default function VerifyOtp() {
     }
 
     try {
-      await api.post("/auth/verify-otp", { emailAddress, otp: otpCode });
+      await api.post("/api/auth/verify-otp", { emailAddress, otp: otpCode });
       toast.success("OTP verified");
       navigate("/reset-password");
     } catch (err) {

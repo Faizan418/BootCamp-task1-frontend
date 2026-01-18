@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/axios";
+import { api } from "../api";
 import toast from "react-hot-toast";
 
 export default function ResetPassword() {
@@ -27,7 +27,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const res = await api.post("/auth/reset-password", {
+      const res = await api.post("/api/auth/reset-password", {
         emailAddress,
         newPassword: password,
       });

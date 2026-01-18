@@ -9,7 +9,6 @@ import Income from "./pages/Income";
 import Profile from "./pages/Profile";
 import Expenses from "./pages/Expenses";
 import Home from "./pages/Home";
-import Loader from "./components/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./features/authslice";
@@ -76,19 +75,18 @@ const router = createBrowserRouter([
 
 export default function App() {
   const dispatch = useDispatch();
-  const { user, loading } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(checkAuth());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (user) {
       dispatch(fetchDashboardData());
     }
-  }, [user]);
-
-  if (loading) return <Loader />;
+  }, [user, dispatch]);
 
   return <RouterProvider router={router} />;
 }
+

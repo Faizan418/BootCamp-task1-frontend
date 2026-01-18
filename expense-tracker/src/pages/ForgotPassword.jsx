@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/axios";
+import { api } from "../api";
+
 import toast from "react-hot-toast";
 
 export default function ForgotPassword() {
@@ -12,7 +13,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post("/auth/forgot-password", { emailAddress: email });
+      const res = await api.post("/api/auth/forgot-password", { emailAddress: email });
       toast.success(res.data.message || "OTP sent to your email");
 
       // ✅ Save email for next page

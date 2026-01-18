@@ -234,10 +234,19 @@ export default function Home() {
       </div>
 
       {/* ===== TRANSACTIONS ===== */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <TransactionCard title="Recent Expenses" transactions={expenseArr.slice(0, 5)} type="expense" />
-        <TransactionCard title="Recent Income" transactions={incomeArr.slice(0, 5)} type="income" />
-      </div>
+<div className="grid lg:grid-cols-2 gap-8">
+  <TransactionCard
+    title="Recent Expenses"
+    transactions={expenseArr.slice(0, 5)}
+    type="expense"
+  />
+  <TransactionCard
+    title="Recent Income"
+    transactions={incomeArr.slice(0, 5)}
+    type="income"
+  />
+</div>
+
 
     </div>
   );
