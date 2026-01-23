@@ -35,7 +35,7 @@ export default function TransactionCard({ title, transactions = [], type }) {
           {type}
         </span>
       </div>
-
+#050816
       {/* --- TOTAL STAT CARD --- */}
       <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 transition-all ${
         isIncome ? "bg-gradient-to-br from-emerald-500/20 to-emerald-500/5" : "bg-gradient-to-br from-rose-500/20 to-rose-500/5"

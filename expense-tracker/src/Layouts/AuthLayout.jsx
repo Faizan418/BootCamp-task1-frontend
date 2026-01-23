@@ -20,7 +20,7 @@ const data = [
 
 export default function AuthLayout() {
   return (
-    <div className="min-h-screen relative bg-neutral-950 overflow-hidden border p-5">
+    <div className="min-h-screen relative bg-neutral-950 overflow-hidden border p-2">
 
       {/* ===== BACKGROUND ===== */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-neutral-950 to-pink-900/20" />
@@ -29,7 +29,7 @@ export default function AuthLayout() {
       <div className="relative z-10 min-h-screen grid lg:grid-cols-2">
 
         {/* ================= LEFT (FORM AREA) ================= */}
-        <div className="flex items-center justify-center px-6 sm:px-10">
+        <div className="flex items-center justify-center px-2 sm:px-6">
           <div className="w-full max-w-md">
 
             {/* BRAND */}
@@ -46,7 +46,7 @@ export default function AuthLayout() {
             </div>
 
             {/* FORM CARD */}
-            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 sm:p-10 shadow-[0_40px_120px_rgba(0,0,0,0.6)]">
+            <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-4 pt-10 pb-6 sm:p-6 shadow-[0_40px_120px_rgba(0,0,0,0.6)]">
               <Outlet />
             </div>
           </div>

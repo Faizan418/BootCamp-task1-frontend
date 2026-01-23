@@ -13,7 +13,7 @@ export default function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="hidden md:flex rounded-[3rem] mt-10 mb-10 ml-8 rounded-4xl h-screen w-72 sticky top-0 z-40 bg-[#0a0f1e] border-r border-white/5 flex-col shadow-[20px_0_50px_rgba(0,0,0,0.2)]">
+    <aside className="hidden md:flex h-screen w-72 sticky top-0 z-40 bg-[#0a0f1e] border-r border-white/5 flex-col shadow-[20px_0_50px_rgba(0,0,0,0.2)]">
       
       {/* --- BRAND / LOGO (Matching Dashboard Header) --- */}
       <div className="px-8 py-10">

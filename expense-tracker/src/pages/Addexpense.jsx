@@ -47,7 +47,7 @@ export default function Addexpense() {
     >
       <form
         onSubmit={handleSubmit}
-        className="relative bg-[#0a0f1e]/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-4 md:p-8 shadow-2xl overflow-hidden"
+        className="relative bg-[#0a0f1e]/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-4 md:p-6 shadow-2xl overflow-hidden"
       >
         {/* Background Gradient Accents (Rose Theme) */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-500/0 via-rose-500 to-rose-500/0" />

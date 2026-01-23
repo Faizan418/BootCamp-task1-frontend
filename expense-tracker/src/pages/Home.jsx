@@ -64,7 +64,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-10 pb-20 ">
       <Toaster position="top-right" toastOptions={{ style: { zIndex: 99999 } }} />
 
       {/* ===== PREMIUM MODAL ===== */}
@@ -72,14 +72,14 @@ export default function Home() {
         {modal.isOpen && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center h-[100%] justify-center p-4 backdrop-blur-md bg-black/30"
+            className="fixed inset-0 z-50 flex items-center h-[100%] justify-center backdrop-blur-md bg-black/70"
           >
             <motion.div 
               initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
               className="relative w-full h-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden"
             >
               
-              <div className="p-8 custom-scrollbar max-h-[90vh] overflow-y-auto">
+              <div className="p-2 custom-scrollbar max-h-[100vh] overflow-y-auto">
                 {modal.type === "income" ? <Addincome /> : <Addexpense />}
               </div>
             </motion.div>
